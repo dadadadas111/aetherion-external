@@ -32,7 +32,7 @@ function createTransporter() {
 
 // Simple POST /sendemail
 // Expected JSON body: { to, subject, text, html? }
-app.post('/sendemail', async (req, res) => {
+app.post('/sendemail', (req, res) => {
   const { to, subject, text, html, from } = req.body || {};
 
   // Basic validation
@@ -48,19 +48,37 @@ app.post('/sendemail', async (req, res) => {
     html,
   };
 
-  try {
-    const transporter = createTransporter();
+  // Generate a simple job ID for tracking
+  const jobId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
-    // Verify connection configuration first (fast failure)
-    await transporter.verify();
+  // Send immediate response
+  res.json({ 
+    message: 'Email queued for sending', 
+    jobId: jobId,
+    status: 'queued'
+  });
 
-    const info = await transporter.sendMail(mailOptions);
-    return res.json({ message: 'Email sent', messageId: info.messageId, accepted: info.accepted, rejected: info.rejected });
-  } catch (err) {
-    console.error('Error sending email:', err && err.stack ? err.stack : err);
-    return res.status(500).json({ error: 'Failed to send email', details: err && err.message ? err.message : String(err) });
-  }
+  // Process email sending in background (no await)
+  sendEmailInBackground(mailOptions, jobId);
 });
+
+// Background email sending function
+async function sendEmailInBackground(mailOptions, jobId) {
+  try {
+    console.log(`[${jobId}] Starting email send to ${mailOptions.to}`);
+    
+    const transporter = createTransporter();
+    
+    // Verify connection configuration first
+    await transporter.verify();
+    
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[${jobId}] Email sent successfully. MessageId: ${info.messageId}`);
+    console.log(`[${jobId}] Accepted: ${JSON.stringify(info.accepted)}, Rejected: ${JSON.stringify(info.rejected)}`);
+  } catch (err) {
+    console.error(`[${jobId}] Error sending email:`, err && err.stack ? err.stack : err);
+  }
+}
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
