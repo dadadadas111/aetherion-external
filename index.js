@@ -8,6 +8,11 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+// Simple health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ message: 'Hello World', status: 'ok', timestamp: new Date().toISOString() });
+});
+
 const SMTP_EMAIL = process.env.SMTP_EMAIL;
 const SMTP_PASSWORD = process.env.SMTP_PASSWORD;
 const SMTP_HOST = process.env.SMTP_HOST;
