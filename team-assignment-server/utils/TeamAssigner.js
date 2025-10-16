@@ -77,6 +77,9 @@ class TeamAssigner {
         // Now assign teams alternating but filling to ensure balance while keeping earlier ordering
         const finalTeamCounts = { 0: 0, 1: 0 };
         const players = ordered;
+        // Track per-team order counters so each player on a team gets an order 0..2
+        const teamOrderCounter = { 0: 0, 1: 0 };
+
         for (let i = 0; i < players.length; i++) {
             const player = players[i];
             // Prefer to put player into the team that already contains their lobby (if any)
@@ -100,8 +103,11 @@ class TeamAssigner {
             if (finalTeamCounts[assigned] >= maxPerTeam) assigned = 1 - assigned;
 
             player.team = assigned;
+            // assign order within team (0..2)
+            player.order = teamOrderCounter[assigned];
+            teamOrderCounter[assigned] = Math.min(2, teamOrderCounter[assigned] + 1);
             finalTeamCounts[assigned]++;
-            console.log(`${player.playerId} → Team ${player.team} (lobbyId=${player.lobbyId})`);
+            console.log(`${player.playerId} → Team ${player.team} order=${player.order} (lobbyId=${player.lobbyId})`);
         }
         
         // Verify team balance

@@ -51,6 +51,7 @@ class MatchManager {
             playerName,
             lobbyId: lobbyId || null,
             team: null,
+            order: null,
             registeredAt: new Date()
         });
         
@@ -63,7 +64,7 @@ class MatchManager {
             console.log(`Teams assigned for match ${matchId}`);
         }
         
-        return {
+        const response = {
             success: true,
             message: match.teamsAssigned ? 'Player registered - teams assigned' : 'Player registered successfully',
             matchId,
@@ -71,6 +72,17 @@ class MatchManager {
             registeredPlayers: match.players.size,
             teamsAssigned: match.teamsAssigned
         };
+
+        // If teams were assigned, include the player's team and order for convenience
+        if (match.teamsAssigned) {
+            const p = match.players.get(playerId);
+            if (p) {
+                response.team = p.team;
+                response.order = p.order != null ? p.order : null;
+            }
+        }
+
+        return response;
     }
     
     getTeamAssignment(matchId, playerId) {
@@ -98,16 +110,18 @@ class MatchManager {
             };
         }
         
+        // If teams are not assigned yet, return team as null so clients always receive a 'team' field.
         if (!match.teamsAssigned || player.team === null) {
             return {
-                success: false,
+                success: true,
                 message: 'Teams not assigned yet',
                 matchId,
                 playerId,
+                team: null,
                 registeredPlayers: match.players.size
             };
         }
-        
+
         return {
             success: true,
             playerId,
@@ -134,7 +148,14 @@ class MatchManager {
             totalPlayers: this.maxPlayers,
             registeredPlayers: match.players.size,
             teamsAssigned: match.teamsAssigned,
-            players: Array.from(match.players.values())
+            players: Array.from(match.players.values()).map(p => ({
+                playerId: p.playerId,
+                playerName: p.playerName,
+                lobbyId: p.lobbyId || null,
+                team: p.team,
+                order: p.order != null ? p.order : null,
+                registeredAt: p.registeredAt
+            }))
         };
     }
     
