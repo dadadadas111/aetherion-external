@@ -64,7 +64,7 @@ class MatchManager {
             console.log(`Teams assigned for match ${matchId}`);
         }
         
-        const response = {
+        return {
             success: true,
             message: match.teamsAssigned ? 'Player registered - teams assigned' : 'Player registered successfully',
             matchId,
@@ -72,17 +72,6 @@ class MatchManager {
             registeredPlayers: match.players.size,
             teamsAssigned: match.teamsAssigned
         };
-
-        // If teams were assigned, include the player's team and order for convenience
-        if (match.teamsAssigned) {
-            const p = match.players.get(playerId);
-            if (p) {
-                response.team = p.team;
-                response.order = p.order != null ? p.order : null;
-            }
-        }
-
-        return response;
     }
     
     getTeamAssignment(matchId, playerId) {
@@ -118,6 +107,7 @@ class MatchManager {
                 matchId,
                 playerId,
                 team: null,
+                order: null,
                 registeredPlayers: match.players.size
             };
         }
@@ -126,6 +116,7 @@ class MatchManager {
             success: true,
             playerId,
             team: player.team,
+            order: player.order,
             matchId,
             message: 'Team assignment found'
         };
@@ -148,14 +139,7 @@ class MatchManager {
             totalPlayers: this.maxPlayers,
             registeredPlayers: match.players.size,
             teamsAssigned: match.teamsAssigned,
-            players: Array.from(match.players.values()).map(p => ({
-                playerId: p.playerId,
-                playerName: p.playerName,
-                lobbyId: p.lobbyId || null,
-                team: p.team,
-                order: p.order != null ? p.order : null,
-                registeredAt: p.registeredAt
-            }))
+            players: Array.from(match.players.values())
         };
     }
     
