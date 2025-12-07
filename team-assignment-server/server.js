@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
+const { createRedisClient, closeRedisClient } = require('./config/redis');
 const apiRoutes = require('./routes/api');
 
 const app = express();
@@ -45,6 +47,38 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`Team Assignment Server running on port ${PORT}`);
-});
+// Initialize Redis and start server
+async function startServer() {
+    try {
+        // Initialize Redis client
+        createRedisClient();
+        
+        // Initialize MatchManager with Redis
+        const MatchManager = require('./models/MatchManager');
+        MatchManager.initialize();
+        
+        // Start server
+        app.listen(PORT, () => {
+            console.log(`Team Assignment Server running on port ${PORT}`);
+        });
+        
+        // Graceful shutdown
+        process.on('SIGTERM', async () => {
+            console.log('SIGTERM received, shutting down gracefully...');
+            await closeRedisClient();
+            process.exit(0);
+        });
+
+        process.on('SIGINT', async () => {
+            console.log('SIGINT received, shutting down gracefully...');
+            await closeRedisClient();
+            process.exit(0);
+        });
+        
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+startServer();
