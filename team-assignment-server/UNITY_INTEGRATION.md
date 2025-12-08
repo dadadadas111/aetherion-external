@@ -83,6 +83,7 @@ public class MatchMetadataResponse
     public bool teamsAssigned;
     public int totalPlayers;
     public int registeredPlayers;
+    public int map;  // Random map selection: 1 or 2
     public TeamData teams;
 }
 ```
@@ -250,6 +251,7 @@ public class MatchmakingManager : MonoBehaviour
   "teamsAssigned": true,
   "totalPlayers": 6,
   "registeredPlayers": 6,
+  "map": 1,
   "teams": {
     "team0": [
       {
@@ -317,6 +319,7 @@ public class MatchmakingManager : MonoBehaviour
 ---
 
 ## Key Points
+- **`map`**: Randomly assigned map ID (1 or 2) when match is created - use this to load the correct map scene
 - **`order`**: Use this for spawn point positioning (0, 1, 2 within each team)
 - **`lobbyId`**: Shows which players came from the same lobby (helps with friend grouping)
 - **`team`**: 0 or 1 for team assignment, null if not yet assigned

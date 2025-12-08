@@ -123,6 +123,7 @@ class MatchManager {
             teamsAssigned: match.teamsAssigned,
             totalPlayers: match.maxPlayers,
             registeredPlayers: match.players.size,
+            map: match.map,
             teams: {
                 team0,
                 team1,
@@ -140,9 +141,10 @@ class MatchManager {
                 players: new Map(),
                 teamsAssigned: false,
                 createdAt: new Date(),
-                maxPlayers: this.maxPlayers
+                maxPlayers: this.maxPlayers,
+                map: Math.floor(Math.random() * 2) + 1 // Random: 1 or 2
             };
-            console.log(`Created new match: ${matchId}`);
+            console.log(`Created new match: ${matchId} with map ${match.map}`);
         }
         
         // Check if match is full
@@ -199,7 +201,8 @@ class MatchManager {
             matchId,
             playerId,
             registeredPlayers: match.players.size,
-            teamsAssigned: match.teamsAssigned
+            teamsAssigned: match.teamsAssigned,
+            map: match.map
         };
     }
     
@@ -237,7 +240,8 @@ class MatchManager {
                 playerId,
                 team: null,
                 order: null,
-                registeredPlayers: match.players.size
+                registeredPlayers: match.players.size,
+                map: match.map
             };
         }
 
@@ -247,7 +251,8 @@ class MatchManager {
             team: player.team,
             order: player.order,
             matchId,
-            message: 'Team assignment found'
+            message: 'Team assignment found',
+            map: match.map
         };
     }
     
@@ -268,6 +273,7 @@ class MatchManager {
             totalPlayers: this.maxPlayers,
             registeredPlayers: match.players.size,
             teamsAssigned: match.teamsAssigned,
+            map: match.map,
             players: Array.from(match.players.values())
         };
     }

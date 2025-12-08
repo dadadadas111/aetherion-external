@@ -46,7 +46,7 @@ npm start
   ```
 - **GET /api/match-metadata/:matchId** - Get full match metadata with all players' info and team assignments
   - Returns organized teams (team0, team1, unassigned) with player details
-  - Includes: name, level, avatarId, team, order, lobbyId
+  - Includes: map (1 or 2), name, level, avatarId, team, order, lobbyId
 
 ## Features
 
