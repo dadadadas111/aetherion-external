@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://aetherion-node.onrender.com'; // Change to 'http://localhost:3000' if running locally
 const TEST_MATCH_ID = 'metadata-test-' + Date.now();
 
 // Test colors for output

@@ -41,6 +41,7 @@ class MatchManager {
             name: metadata.name || 'Unknown',
             level: metadata.level || 1,
             avatarId: metadata.avatarId || 0,
+            rank: metadata.rank || 'Unranked',
             team: null, // Will be set when teams are assigned
             updatedAt: new Date().toISOString()
         };
@@ -94,6 +95,7 @@ class MatchManager {
                     name: metadata.name,
                     level: metadata.level,
                     avatarId: metadata.avatarId,
+                    rank: metadata.rank,
                     team: metadata.team,
                     order: metadata.order,
                     lobbyId: playerData.lobbyId
@@ -105,6 +107,7 @@ class MatchManager {
                     name: playerData.playerName || 'Unknown',
                     level: 1,
                     avatarId: 0,
+                    rank: 'Unranked',
                     team: playerData.team,
                     order: playerData.order,
                     lobbyId: playerData.lobbyId
