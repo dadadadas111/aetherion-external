@@ -69,7 +69,7 @@ router.get('/status/:matchId', async (req, res) => {
 // POST /api/set-metadata
 router.post('/set-metadata', async (req, res) => {
     try {
-        const { playerId, name, level, avatarId } = req.body;
+        const { playerId, name, level, avatarId, rank } = req.body;
 
         // Validation
         if (!playerId) {
@@ -82,7 +82,8 @@ router.post('/set-metadata', async (req, res) => {
         const result = await MatchManager.setPlayerMetadata(playerId, {
             name,
             level,
-            avatarId
+            avatarId,
+            rank
         });
         
         res.json(result);

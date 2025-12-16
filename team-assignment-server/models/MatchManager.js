@@ -40,14 +40,14 @@ class MatchManager {
         const playerMetadata = {
             name: metadata.name || 'Unknown',
             level: metadata.level || 1,
-            avatarId: metadata.avatarId || 0,
+            avatarId: metadata.avatarId ?? 0,
             rank: metadata.rank || 'Unranked',
             team: null, // Will be set when teams are assigned
             updatedAt: new Date().toISOString()
         };
         
         await this.redis.set(`metadata:${playerId}`, JSON.stringify(playerMetadata), 'EX', 7200); // 2 hour TTL
-        console.log(`Metadata set for player ${playerId}`);
+        console.log(`Metadata set for player ${playerId}:`, JSON.stringify(playerMetadata));
         
         return {
             success: true,
