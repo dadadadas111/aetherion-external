@@ -5,21 +5,22 @@
 ### Step 1: Set Player Metadata (Before/During Matchmaking)
 ```csharp
 // Call this when player enters matchmaking lobby
-POST http://your-server:3000/api/set-metadata
+POST https://aetherion-node.onrender.com/api/set-metadata
 Content-Type: application/json
 
 {
     "playerId": "player_unique_id",
     "name": "PlayerName",
     "level": 10,
-    "avatarId": 1
+    "avatarId": 1,
+    "rank": "Gold"
 }
 ```
 
 ### Step 2: Register for Match (Existing API - No Changes)
 ```csharp
 // Call this to join a specific match
-POST http://your-server:3000/api/register
+POST https://aetherion-node.onrender.com/api/register
 Content-Type: application/json
 
 {
@@ -35,7 +36,7 @@ Content-Type: application/json
 ### Step 3: Fetch Match Metadata for UI Display
 ```csharp
 // Call this when teamsAssigned = true (or periodically poll)
-GET http://your-server:3000/api/match-metadata/{matchId}
+GET https://aetherion-node.onrender.com/api/match-metadata/{matchId}
 
 // Returns organized team data with all player info
 ```
@@ -53,6 +54,7 @@ public class PlayerMetadata
     public string name;
     public int level;
     public int avatarId;
+    public string rank;
 }
 
 [System.Serializable]
@@ -62,6 +64,7 @@ public class PlayerInfo
     public string name;
     public int level;
     public int avatarId;
+    public string rank;
     public int? team;  // 0 or 1, null if not assigned
     public int? order; // 0, 1, or 2 (spawn order)
     public string lobbyId;
@@ -96,17 +99,18 @@ using System.Collections;
 
 public class TeamAssignmentClient : MonoBehaviour
 {
-    private const string BASE_URL = "http://your-server:3000/api";
+    private const string BASE_URL = "https://aetherion-node.onrender.com/api";
     
     // Step 1: Set player metadata
-    public IEnumerator SetPlayerMetadata(string playerId, string name, int level, int avatarId)
+    public IEnumerator SetPlayerMetadata(string playerId, string name, int level, int avatarId, string rank)
     {
         var metadata = new PlayerMetadata
         {
             playerId = playerId,
             name = name,
             level = level,
-            avatarId = avatarId
+            avatarId = avatarId,
+            rank = rank
         };
         
         string json = JsonUtility.ToJson(metadata);
@@ -181,15 +185,15 @@ public class TeamAssignmentClient : MonoBehaviour
         Debug.Log("=== TEAM 0 (Blue) ===");
         foreach (var player in teams.team0)
         {
-            Debug.Log($"{player.name} (Lv.{player.level}) - Avatar: {player.avatarId} - Order: {player.order}");
-            // Update UI: Show player card with name, level, avatar, spawn position
+            Debug.Log($"{player.name} (Lv.{player.level}) [{player.rank}] - Avatar: {player.avatarId} - Order: {player.order}");
+            // Update UI: Show player card with name, level, rank, avatar, spawn position
         }
         
         Debug.Log("=== TEAM 1 (Red) ===");
         foreach (var player in teams.team1)
         {
-            Debug.Log($"{player.name} (Lv.{player.level}) - Avatar: {player.avatarId} - Order: {player.order}");
-            // Update UI: Show player card with name, level, avatar, spawn position
+            Debug.Log($"{player.name} (Lv.{player.level}) [{player.rank}] - Avatar: {player.avatarId} - Order: {player.order}");
+            // Update UI: Show player card with name, level, rank, avatar, spawn position
         }
     }
 }
@@ -215,9 +219,10 @@ public class MatchmakingManager : MonoBehaviour
         string playerName = PlayerPrefs.GetString("PlayerName");
         int playerLevel = PlayerPrefs.GetInt("PlayerLevel");
         int avatarId = PlayerPrefs.GetInt("SelectedAvatar");
+        string playerRank = PlayerPrefs.GetString("PlayerRank");
         
         // Set metadata first
-        StartCoroutine(client.SetPlayerMetadata(myPlayerId, playerName, playerLevel, avatarId));
+        StartCoroutine(client.SetPlayerMetadata(myPlayerId, playerName, playerLevel, avatarId, playerRank));
     }
     
     // Called when match is found
@@ -259,6 +264,7 @@ public class MatchmakingManager : MonoBehaviour
         "name": "Alice",
         "level": 10,
         "avatarId": 1,
+        "rank": "Gold",
         "team": 0,
         "order": 0,
         "lobbyId": "lobby_alpha"
@@ -268,6 +274,7 @@ public class MatchmakingManager : MonoBehaviour
         "name": "Bob",
         "level": 15,
         "avatarId": 2,
+        "rank": "Platinum",
         "team": 0,
         "order": 1,
         "lobbyId": "lobby_alpha"
@@ -277,6 +284,7 @@ public class MatchmakingManager : MonoBehaviour
         "name": "Eve",
         "level": 12,
         "avatarId": 5,
+        "rank": "Silver",
         "team": 0,
         "order": 2,
         "lobbyId": null
@@ -288,6 +296,7 @@ public class MatchmakingManager : MonoBehaviour
         "name": "Charlie",
         "level": 8,
         "avatarId": 3,
+        "rank": "Bronze",
         "team": 1,
         "order": 0,
         "lobbyId": "lobby_beta"
@@ -297,6 +306,7 @@ public class MatchmakingManager : MonoBehaviour
         "name": "David",
         "level": 20,
         "avatarId": 4,
+        "rank": "Diamond",
         "team": 1,
         "order": 1,
         "lobbyId": "lobby_beta"
@@ -306,6 +316,7 @@ public class MatchmakingManager : MonoBehaviour
         "name": "Frank",
         "level": 18,
         "avatarId": 6,
+        "rank": "Gold",
         "team": 1,
         "order": 2,
         "lobbyId": null
